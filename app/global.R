@@ -58,101 +58,105 @@ if (!require("viridis")) {
   library(viridis)
 }
 #--------------------------------------------------------------------
-###############################Define Functions#######################
-data_cooker <- function(df){
-  #input dataframe and change the Country/Region column into standard format
-  df$Country.Region <- as.character(df$Country.Region)
-  df$Country.Region[df$Country.Region == "Congo (Kinshasa)"] <- "Dem. Rep. Congo"
-  df$Country.Region[df$Country.Region == "Congo (Brazzaville)"] <- "Congo"
-  df$Country.Region[df$Country.Region == "Central African Republic"] <- "Central African Rep."
-  df$Country.Region[df$Country.Region == "Equatorial Guinea"] <- "Eq. Guinea"
-  df$Country.Region[df$Country.Region == "Western Sahara"]<-"W. Sahara"
-  df$Country.Region[df$Country.Region == "Eswatini"] <- "eSwatini"
-  df$Country.Region[df$Country.Region == "Taiwan*"] <- "Taiwan"
-  df$Country.Region[df$Country.Region== "Cote d'Ivoire"] <-"Côte d'Ivoire"
-  df$Country.Region[df$Country.Region == "Korea, South"] <- "South Korea"
-  df$Country.Region[df$Country.Region == "Bosnia and Herzegovina"] <- "Bosnia and Herz."
-  df$Country.Region[df$Country.Region == "US"] <- "United States of America"
-  df$Country.Region[df$Country.Region == "Burma"]<-"Myanmar"
-  df$Country.Region[df$Country.Region == "Holy See"]<-"Vatican"
-  df$Country.Region[df$Country.Region=="South Sudan"]<-"S. Sudan"
-  return(df)
-}
+
+############################### NYC map data ###############################
+# Data Sources
+#   nyc Health data
+#
+# get NYC covid data based on Modified Zip code
+# First get ZCTA (zip code) to MODZCTA data:
+zcta_to_modzctaURL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/Geography-resources/ZCTA-to-MODZCTA.csv")
+zcta_to_modzcta <- read.csv( text=zcta_to_modzctaURL )
+
+# NYC Covid data by MODZCTA(cummulative):
+data_by_modzctaURL <- getURL('https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/data-by-modzcta.csv')
+data_by_modzcta <- read.csv( text=data_by_modzctaURL )
+
+# get data by nyc neighborhoods
+#----  total cases, death, total covid tests by each neighborhood
+nyc_neighborhoods <- data_by_modzcta %>%
+  select(
+    "MODIFIED_ZCTA","NEIGHBORHOOD_NAME", 
+    "BOROUGH_GROUP", "COVID_CASE_COUNT", 
+    "COVID_CASE_RATE", "PERCENT_POSITIVE", "COVID_DEATH_COUNT",
+    "TOTAL_COVID_TEST"
+  )
+
+# import geojson file from NYC open data
+nyc_zipcode_geo <- sf::st_read("./output/ZIP_CODE_040114/ZIP_CODE_040114.shp") %>%
+  sf::st_transform('+proj=longlat +datum=WGS84')
+nyc_zipcode_geo$ZIPCODE <- type.convert(nyc_zipcode_geo$ZIPCODE)
+
+# import longitude and latitude data
+nyc_lat_data <- read.csv("../data/zc_geo.csv", sep= ";")
+
+nyc_lat_table<-nyc_lat_data %>%
+  select("Zip", "Latitude", "Longitude")
+
+# match zipcode with longitude and latitude data and merge new data
+nyc_neighborhoods <- nyc_neighborhoods %>%
+  mutate(
+    LAT_repre = nyc_lat_data$Latitude[
+      match(nyc_neighborhoods$MODIFIED_ZCTA, nyc_lat_data$Zip) ]
+  ) %>%
+  mutate(
+    LNG_repre = nyc_lat_data$Longitude[ 
+      match(nyc_neighborhoods$MODIFIED_ZCTA, nyc_lat_data$Zip) ]
+  )
+
+# data for line chart and positive rate
+nyc_recent_4w_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/archive/recent-4-week-by-modzcta.csv")
+nyc_recent_4w_cases <- read.csv(text = nyc_recent_4w_URL)
+
+# recent_use_dat
+nyc_recent_4w_data <- nyc_recent_4w_cases %>%
+  select("MODIFIED_ZCTA","NEIGHBORHOOD_NAME","COVID_CASE_RATE_WEEK4",
+         "COVID_CASE_RATE_WEEK3","COVID_CASE_RATE_WEEK2","COVID_CASE_RATE_WEEK1",
+         "PERCENT_POSITIVE_4WEEK" )
+
+#data for positive rate in the last 7 days
+nyc_7days_URL <-getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/latest/last7days-by-modzcta.csv")
+nyc_7days_masterdata <- read.csv(text=nyc_7days_URL)
+
+#7 days data that will be used
+nyc_7days_data <- nyc_7days_masterdata %>% 
+  select("modzcta", "modzcta_name", "percentpositivity_7day", 
+         "median_daily_test_rate")
+
+#data by day (death, confirmed cases, hospitalization) NOT CONCERNING ZIP CODE
+#----- Confirmed Cases--------
+cases_by_day_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/cases-by-day.csv")
+cases_by_day_masterdata <- read.csv(text=cases_by_day_URL)
+
+#confirmed cases by day and by borough if needed
+cases_by_day_data <- cases_by_day_masterdata %>%
+  select("date_of_interest", "CASE_COUNT", "BX_CASE_COUNT", "BK_CASE_COUNT",
+         "MN_CASE_COUNT", "QN_CASE_COUNT", "SI_CASE_COUNT")
+
+#death by day and borough if needed
+death_by_day_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/deaths-by-day.csv")
+death_by_day_masterdata <- read.csv(text=death_by_day_URL)
+
+death_by_day_data <- death_by_day_masterdata %>%
+  select("date_of_interest", "DEATH_COUNT", "BX_DEATH_COUNT",
+         "BK_DEATH_COUNT", "MN_DEATH_COUNT", "QN_DEATH_COUNT")
+
+#hospitalization by day and borough if needed
+hosp_by_day_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/hosp-by-day.csv")
+hosp_by_day_masterdata <- read.csv(text=hosp_by_day_URL)
+
+hosp_by_day_data <- hosp_by_day_masterdata %>%
+  select("date_of_interest", "HOSPITALIZED_COUNT", "BX_HOSPITALIZED_COUNT", 
+         "BK_HOSPITALIZED_COUNT", "MN_HOSPITALIZED_COUNT", 
+         "QN_HOSPITALIZED_COUNT", "SI_HOSPITALIZED_COUNT")
+
+#Data by race and sex and borough (cumulative)
+racesex_data_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/group-data-by-boro.csv")
+racesex_data_master <- as.data.frame(read.csv(text=racesex_data_URL))
+racesex_data <- racesex_data_master[c(0,13:18), ]
 
 
-data_transformer <- function(df) {
-  #################################################################
-  ##Given dataframe tranform the dataframe into aggregate level with
-  ##rownames equal to countries name, and colnames equals date
-  #################################################################
-  #clean the country/regionnames
-  df <- data_cooker(df)
-  #columns that don't need 
-  not_select_cols <- c("Province.State","Lat","Long")
-  #aggregate the province into country level
-  aggre_df <- df %>% group_by(Country.Region) %>% 
-    select(-one_of(not_select_cols)) %>% summarise_all(sum)
-  #assign the country name into row names 
-  aggre_df <- aggre_df %>% remove_rownames %>% 
-    tibble::column_to_rownames(var="Country.Region")
-  #change the colume name into date format
-  date_name <- colnames(aggre_df)
-  #change e.g: "x1.22.20" -> "2020-01-22"
-  date_choices <- as.Date(date_name,format = 'X%m.%d.%y')
-  #assign column nam
-  colnames(aggre_df) <- date_choices
-  return(aggre_df)
-}
-#--------------------------------------------------------------------
-###############################Data Preparation#######################
-#Data Sources
-"Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. 
-Lancet Inf Dis. 20(5):533-534. doi: 10.1016/S1473-3099(20)30120-1"
-#get the daily global cases data from API
-Cases_URL <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-global_cases <- read.csv(Cases_URL)
-
-#get the daily global deaths data from API
-Death_URL <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
-global_death <- read.csv(Death_URL)
 
 
-#get aggregate cases 
-aggre_cases <- as.data.frame(data_transformer(global_cases))
-#get aggregate death
-aggre_death <- as.data.frame(data_transformer(global_death))
-#define date_choices 
-date_choices <- as.Date(colnames(aggre_cases),format = '%Y-%m-%d')
-#define country_names
-country_names_choices <- rownames(aggre_cases)
 
-#Download the spatial polygons dataframe in this link
-# https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-countries-2/
-
-output_shapefile_filepath <- "./output/countries_shapeFile.RData"
-
-#if already has countries_shapeFile.RData under output folder, no need to process it again
-#otherwise, read files from data folder to create countries_shapeFile.RData under output folder
-if(file.exists(output_shapefile_filepath)){
-  load(output_shapefile_filepath)
-}else{
-  countries <- readOGR(dsn ="../data/ne_50m_admin_0_countries",
-                       layer = "ne_50m_admin_0_countries",
-                       encoding = "utf-8",use_iconv = T,
-                       verbose = FALSE)
-  save(countries, file=output_shapefile_filepath)
-}
-
-
-#make a copy of aggre_cases dataframe
-aggre_cases_copy <- as.data.frame(aggre_cases)
-aggre_cases_copy$country_names <- as.character(rownames(aggre_cases_copy))
-
-#make a copy of aggre_death dataframe
-aggre_death_copy <- as.data.frame(aggre_death)
-aggre_death_copy$country_names <- as.character(rownames(aggre_death_copy))
-
-binning<- function(x) {10^(ceiling(log10(x)))}
-
-#use save.image() at any time to save all environment data into an .RData file
-save.image(file='./output/covid-19.RData')
+                                              
