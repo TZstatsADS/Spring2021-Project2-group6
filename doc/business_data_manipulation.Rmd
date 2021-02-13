@@ -14,7 +14,7 @@ require(lubridate)
 ```
 
 ```{r}
-setwd("~/Downloads")
+setwd("../Data")
 lic = read_csv("License_Applications.csv")
 legal_b = read_csv("Legally_Operating_Businesses.csv")
 ```
@@ -23,6 +23,7 @@ legal_b = read_csv("Legally_Operating_Businesses.csv")
 str(lic)
 str(legal_b)
 ```
+
 ```{r}
 lic%>%count(`License Category`, sort = TRUE)
 licence_app = lic %>% mutate(business_type = ifelse(grepl("Cafe", `License Category`), "food_beverage", 
@@ -38,6 +39,7 @@ licence_app = lic %>% mutate(business_type = ifelse(grepl("Cafe", `License Categ
   drop_na()
 str(licence_app)
 
+head(licence_app)
 ```
 
 
@@ -57,6 +59,7 @@ str(legal_business)
 
 date = legal_business %>% filter(status == "Active") %>% mutate(expiration = mdy(expiration)) %>% select(expiration)
 summary(date)
+head(legal_business)
 ```
 
 ```{r}
