@@ -57,6 +57,9 @@ if (!require("viridis")) {
   install.packages("viridis")
   library(viridis)
 }
+
+require(lubridate)
+
 #--------------------------------------------------------------------
 
 ############################### NYC map data ###############################
@@ -88,7 +91,7 @@ nyc_zipcode_geo <- sf::st_read("./output/ZIP_CODE_040114/ZIP_CODE_040114.shp") %
 nyc_zipcode_geo$ZIPCODE <- type.convert(nyc_zipcode_geo$ZIPCODE)
 
 # import longitude and latitude data
-nyc_lat_data <- read.csv("../data/zc_geo.csv", sep= ";")
+nyc_lat_data <- read.csv("./output/zc_geo.csv", sep= ";")
 
 nyc_lat_table<-nyc_lat_data %>%
   select("Zip", "Latitude", "Longitude")
@@ -157,6 +160,60 @@ racesex_data <- racesex_data_master[c(0,13:18), ]
 
 
 
+#######-----------------NYC Business ---------------------#################
+
+lic <-  read_csv("./data/License_Applications.csv")
+legal_b <-  read_csv("./data/Legally_Operating_Businesses.csv")
+
+str(lic)
+str(legal_b)
+
+# group License application data into 4 industries
+lic%>%count(`License Category`, sort = TRUE)
+licence_app = lic %>% mutate(business_type = ifelse(grepl("Cafe", `License Category`), "food_beverage", 
+                                                    ifelse(grepl("Catering", `License Category`), "food_beverage",
+                                                      ifelse(grepl("Amusement", `License Category`), "entertainment",
+                                                      ifelse(grepl("Games", `License Category`), "entertainment",
+                                                      ifelse(grepl("Cabaret", `License Category`), "entertainment",
+                                                      ifelse(grepl("Pool", `License Category`), "entertainment",
+                                                    ifelse(grepl("Improvement", `License Category`), "service", ifelse(grepl("Sightseeing", `License Category`), "service", ifelse(grepl("Picture", `License Category`), "service", ifelse(grepl("Laundr", `License Category`), "service", ifelse(grepl("Locksmith", `License Category`), "service", ifelse(grepl("Serv", `License Category`), "service", ifelse(grepl("Agency", `License Category`), "service", ifelse(grepl("Garage", `License Category`), "service", ifelse(grepl("Driver", `License Category`), "service", ifelse(grepl("Business", `License Category`), "service", ifelse(grepl("Company", `License Category`), "service", ifelse(grepl("Wash", `License Category`), "service", ifelse(grepl("Tow", `License Category`), "service", ifelse(grepl("Parking", `License Category`), "service", ifelse(grepl("Auction", `License Category`), "service", ifelse(grepl("Pawnbroker", `License Category`), "service", ifelse(grepl("Processor", `License Category`), "service", ifelse(grepl("Owner", `License Category`), "service", ifelse(grepl("Repair", `License Category`), "service", ifelse(grepl("Lessor", `License Category`), "service", ifelse(grepl("Distributor", `License Category`), "service", ifelse(grepl("Storage", `License Category`), "service", "retail")))))))))))))))))))))))))))),
+                             ID = gsub("-DCA" , "" ,`License Number`)) %>%
+  filter(State == "NY") %>%
+  select(ID, name = `Business Name`, NeworOld= `Application or Renewal`, end_date = `End Date`, start_date = `Start Date`, business_type, license_cate = `License Category`, zip = Zip) %>%
+  drop_na()
+str(licence_app)
+#head(licence_app)
+
+#group legal business data into 4 industries
+
+legal_business = legal_b %>% mutate(business_type = ifelse(grepl("Cafe", `Industry`), "food_beverage", 
+                                                           ifelse(grepl("Catering", `Industry`), "food_beverage",
+                                                                  ifelse(grepl("Amusement", `Industry`), "entertainment",
+                                                                         ifelse(grepl("Games", `Industry`), "entertainment",
+                                                                                ifelse(grepl("Cabaret", `Industry`), "entertainment",
+                                                                                       ifelse(grepl("Pool", `Industry`), "entertainment",
+                                                                                              ifelse(grepl("Improvement", `Industry`), "service", ifelse(grepl("Sightseeing", `Industry`), "service", ifelse(grepl("Picture", `Industry`), "service", ifelse(grepl("Laundr", `Industry`), "service", ifelse(grepl("Locksmith", `Industry`), "service", ifelse(grepl("Serv", `Industry`), "service", ifelse(grepl("Agency", `Industry`), "service", ifelse(grepl("Garage", `Industry`), "service", ifelse(grepl("Driver", `Industry`), "service", ifelse(grepl("Business", `Industry`), "service", ifelse(grepl("Company", `Industry`), "service", ifelse(grepl("Wash", `Industry`), "service", ifelse(grepl("Tow", `Industry`), "service", ifelse(grepl("Parking", `Industry`), "service", ifelse(grepl("Auction", `Industry`), "service", ifelse(grepl("Pawnbroker", `Industry`), "service", ifelse(grepl("Processor", `Industry`), "service", ifelse(grepl("Owner", `Industry`), "service", ifelse(grepl("Repair", `Industry`), "service", ifelse(grepl("Lessor", `Industry`), "service", ifelse(grepl("Distributor", `Industry`), "service", ifelse(grepl("Storage", `Industry`), "service", "retail")))))))))))))))))))))))))))),
+                                    ID = gsub("-DCA" , "" ,`DCA License Number`)) %>%
+  filter(`Address State` == "NY") %>%
+  select(ID, name = `Business Name`, status = `License Status`, expiration = `License Expiration Date`, business_type, licence_cate = Industry, borough = `Borough Code`, zip = `Address ZIP`) %>%
+  drop_na()
+str(legal_business)
+
+date = legal_business %>% filter(status == "Active") %>% mutate(expiration = mdy(expiration)) %>% select(expiration)
+
+#join 2 business data
+business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
+
+######## ----------- NYC business data NEEDED ---------------~####
+
+Business_closed <- business_data %>% filter(status == "Inactive") %>% 
+  filter(grepl("2020",expiration)) %>%
+  select(name, business_type, borough, zip, expiration) %>%
+  group_by(zip=as.integer(zip)) %>%
+  summarize(no=n()) %>%
+  mutate(depth= ifelse(no <= 9, "light", 
+                       ifelse(no <= 32 & no >9, "intermediate", 
+                              ifelse(no > 32 & no <= 50 , "serious", "very serious"))))
 
 
-                                              
+
