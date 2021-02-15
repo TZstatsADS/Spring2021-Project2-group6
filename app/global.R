@@ -79,7 +79,7 @@ nyc_neighborhoods <- data_by_modzcta %>%
     "MODIFIED_ZCTA","NEIGHBORHOOD_NAME", 
     "BOROUGH_GROUP", "COVID_CASE_COUNT", 
     "COVID_CASE_RATE", "PERCENT_POSITIVE", "COVID_DEATH_COUNT",
-    "TOTAL_COVID_TEST"
+    "TOTAL_COVID_TESTS"
   )
 
 # import geojson file from NYC open data
