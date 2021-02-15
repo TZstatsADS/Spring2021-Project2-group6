@@ -71,9 +71,10 @@ dashboardPage(
                                                 <li>Shinytheme</li>
                                                 <li>Tidyverse</li>
                                                 <li>Dyplr</li><li>Tibble</li><li>Rcurl</li><li>Plotly</li>
-                                                <li>ggplot2</li>",
+                                                <li>ggplot2</li>"),
 
-                                                
+                                        titlePanel("Contacts: "),
+                                        HTML(
 
                                
                                " <p>For more information please feel free to contact</p>",
