@@ -85,6 +85,42 @@ body <- dashboardBody(
           )
         )
         ), 
+    #------------------Business Closed----------------------------
+        tabItem(tabName = "Business Closed", fluidPage(
+          
+          # App title ----
+          titlePanel("Business Closed"),
+          
+          # Sidebar layout with input and output definitions ----
+          sidebarLayout(
+            
+            # Sidebar panel for inputs ----
+            sidebarPanel(
+              
+              # Input: Select for the borough ----
+              selectInput(inputId = "borough",
+                          label = "Choose a borough:",
+                          choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+              
+              # Input: Select for the business type ----
+              selectInput(inputId = "business_type",
+                          label = "Choose a business type:",
+                          choices = c("retail", "service", "food and beverage", "entertainment"))
+              
+            ),
+            
+            # Main panel for displaying outputs ----
+            mainPanel(
+              
+              # Output: tsPlot on borough ----
+              plotOutput(outputId = "tsPlot1"),
+              
+              # Output: tsPlot on business type ----
+              plotOutput(outputId = "tsPlot2")
+              
+            )
+          )
+        ), 
     # ------------------ Appendix --------------------------------
         tabItem(tabName = "Appendix", fluidPage( 
             HTML(
