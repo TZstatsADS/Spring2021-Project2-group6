@@ -16,12 +16,12 @@ library(shinythemes)
 library(plotly)
 library(ggplot2)
 library(shinydashboard)
-        
+
 body <- dashboardBody(
     
     tabItems(
         # ------------------ Home ----------------------------------------------------------------
-            
+        
         tabItem(tabName = "Home", fluidPage(
             fluidRow(box(width = 15, title = "Introduction", status = "primary",
                          solidHeader = TRUE, h3("Covid-19 and NYC business"),
@@ -34,21 +34,60 @@ body <- dashboardBody(
                          solidHeader = TRUE,
                          h5("The application is divided into 5 separate tabs"),
                          tags$div(tags$ul(
-                                 tags$li("The", strong("first"), "tab: Introduction"),
-                                 tags$li("The", strong("second"), "tab: The detailed ZIP code map shows the extent of Covid 19 outbreak in NYC. It provided key information including: confirmed cases, infection rate, number of business that are closed in the neighborhood"),
-                                 tags$li("The", strong("third and fourth"), "tab: stats on recently opened/ closed business during Covid 19, tracked separately for different industries"),
-                                 tags$li("The", strong("fifth"),"tab: Appendix and data sources")
-
+                             tags$li("The", strong("first"), "tab: Introduction"),
+                             tags$li("The", strong("second"), "tab: The detailed ZIP code map shows the extent of Covid 19 outbreak in NYC. It provided key information including: confirmed cases, infection rate, number of business that are closed in the neighborhood"),
+                             tags$li("The", strong("third and fourth"), "tab: stats on recently opened/ closed business during Covid 19, tracked separately for different industries"),
+                             tags$li("The", strong("fifth"),"tab: Appendix and data sources")
+                             
                          ))
-                      ))
-            )), # end of home 
-    
-    # ------------------ Map-----------------------------------
+            ))
+        )), # end of home 
+        
+        # ------------------ Map-----------------------------------
         tabItem(tabName = "Map",
-                    h2("How Many Business Were Closed In Each Neighborhood?", align = 'center'),
-                    leafletOutput("nyc_map_covid", width = "100%", height = 800)
+                h2("How Many Business Were Closed In Each Neighborhood?", align = 'center'),
+                leafletOutput("nyc_map_covid", width = "100%", height = 800)
+        ),
+        
+        #------------------New Business----------------------------
+        tabItem(tabName = "New_Business", fluidPage(
+            
+            # App title ----
+            titlePanel("New Business"),
+            
+            # Sidebar layout with input and output definitions ----
+            sidebarLayout(
+                
+                # Sidebar panel for inputs ----
+                sidebarPanel(
+                    
+                    # Input: Select for the borough ----
+                    selectInput(inputId = "borough",
+                                label = "Choose a borough:",
+                                choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+                    
+                    # Input: Select for the business type ----
+                    selectInput(inputId = "business_type",
+                                label = "Choose a business type:",
+                                choices = c("retail", "service", "food and beverage", "entertainment"))
+                    
                 ),
-    # ------------------ Appendix --------------------------------
+                
+                # Main panel for displaying outputs ----
+                mainPanel(
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot1"),
+                    
+                    # Output: tsPlot on business type ----
+                    plotOutput(outputId = "tsPlot2")
+                    
+                )
+            )
+        )
+        ), 
+        
+        # ------------------ Appendix --------------------------------
         tabItem(tabName = "Appendix", fluidPage( 
             HTML(
                 "<h2> Data Sources </h2>
@@ -58,12 +97,12 @@ body <- dashboardBody(
                 <h4><li>NYC Business Application Data : <a href='https://data.cityofnewyork.us/Business/License-Applications/ptev-4hud' target='_blank'>NYC Open Data</a></li></h4>
                 <h4><li>NYC Minority Owned Business : <a href='https://data.cityofnewyork.us/Business/M-WBE-LBE-and-EBE-Certified-Business-List/ci93-uc8s' target='_blank'>NYC Health + Hospitals</a></li></h4>
                 <h4><li>NYC Geo Data : <a href='https://github.com/ResidentMario/geoplot-data-old' target='_blank'> Geoplot Github</a></li></h4>"
-                ),
+            ),
             
             titlePanel("Disclaimers "),
             
             titlePanel("Acknowledgement  "),
-                        
+            
             HTML(
                 " <p>This application is built using R shiny app.</p>",
                 "<p>The following R packages were used in to build this RShiny application:</p>
@@ -71,10 +110,10 @@ body <- dashboardBody(
                 <li>Tidyverse</li>
                 <li>Dyplr</li><li>Tibble</li><li>Rcurl</li><li>Plotly</li>
                 <li>ggplot2</li>"
-                ),
-        
+            ),
+            
             titlePanel("Contacts"),
-        
+            
             HTML(
                 " <p>For more information please feel free to contact</p>",
                 " <p>Wendy Doan(ad3801@columbia.edu) </p>",
@@ -82,8 +121,8 @@ body <- dashboardBody(
                 " <p>Yandong Xiong(yx2659@columbia.edu) </p>",
                 " <p>TQiao Li(ql2403@columbia.edu)</p>",
                 " <p>James Smiley(jbs2253@columbia.edu) </p>")
-            )) # end of tab
-            
+        )) # end of tab
+        
     ) # end of tab items
 ) # end of body
 
@@ -97,6 +136,7 @@ ui <- dashboardPage(
     dashboardSidebar(sidebarMenu(
         menuItem("Home", tabName = "Home", icon = icon("home")),
         menuItem("Map", tabName = "Map", icon = icon("compass")),
+        menuItem("New Business", tabName = "New_Business", icon = icon("dollar-sign")),
         menuItem("Appendix", tabName = "Appendix", icon = icon("fas fa-asterisk"))
     )),
     body 
