@@ -38,7 +38,11 @@ legal_business = legal_b %>% mutate(business_type = ifelse(grepl("Cafe", `Indust
   select(ID, name = `Business Name`, status = `License Status`, creation = `License Creation Date`, expiration = `License Expiration Date`, business_type, licence_cate = Industry, borough = `Borough Code`, zip = `Address ZIP`) %>%
   drop_na()
 str(legal_business)
+date = legal_business %>% filter(status == "Active") %>% 
+  mutate(expiration = mdy(expiration)) %>% 
+  select(expiration)
 
+<<<<<<< HEAD
 date = legal_business %>% filter(status == "Active") %>% mutate(expiration = mdy(expiration)) %>% select(expiration)
 summary(date)
 business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)%>% filter(status == "Inactive")
@@ -55,5 +59,23 @@ plot(data$n, type = "o", pch = 22, lty = 1, pty = 2,
 axis.Date(1, at=seq(as.Date("01-01-2019"), as.Date("12-01-2020"), by="months"), format="%m-%Y")
 plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2)
 axis.Date(1, at = data$date, format= "%m-%Y", las = 1)
+=======
+#join 2 business data
+#join 2 business data
+business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
+
+
+######## ----------- NYC business data NEEDED ---------------~####
+
+Business_closed <- business_data %>% filter(status == "Inactive") %>% 
+  filter(grepl("2020",expiration)) %>%
+  select(name, business_type, borough, zip, expiration) %>%
+  group_by(zip=as.integer(zip)) %>%
+  summarize(no=n()) %>%
+  mutate(depth= ifelse(no <= 9, "light", 
+                       ifelse(no <= 32 & no >9, "intermediate", 
+                              ifelse(no > 32 & no <= 50 , "serious", "very serious"))))
+
+>>>>>>> 35dfe6585ddf0921397673764bee3c43853a2166
 
 
