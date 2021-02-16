@@ -39,7 +39,7 @@ licence_app = lic %>% mutate(business_type = ifelse(grepl("Cafe", `License Categ
   drop_na()
 str(licence_app)
 
-head(licence_app)
+head(licence_app, 10)
 ```
 
 
@@ -64,7 +64,8 @@ head(legal_business)
 
 ```{r}
 business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
-head(business_data, 10)
+head(business_data, 20)
+business_data
 ```
 
 ```{r}
