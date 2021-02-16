@@ -48,7 +48,7 @@ vignettes/*.pdf
 
 */.DS_Store
 .DS_Store
-
+*/.DS_Store
 
 /data/Legally_Operating_Businesses.csv
 /data/License_Application.csv
