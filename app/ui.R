@@ -48,6 +48,43 @@ body <- dashboardBody(
                     h2("How Many Business Were Closed In Each Neighborhood?", align = 'center'),
                     leafletOutput("nyc_map_covid", width = "100%", height = 800)
                 ),
+    #------------------New Business----------------------------
+        tabItem(tabName = "New Business", fluidPage(
+          
+          # App title ----
+          titlePanel("New Business"),
+          
+          # Sidebar layout with input and output definitions ----
+          sidebarLayout(
+            
+            # Sidebar panel for inputs ----
+            sidebarPanel(
+              
+              # Input: Select for the borough ----
+              selectInput(inputId = "borough",
+                          label = "Choose a borough:",
+                          choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+              
+              # Input: Select for the business type ----
+              selectInput(inputId = "business_type",
+                          label = "Choose a business type:",
+                          choices = c("retail", "service", "food and beverage", "entertainment"))
+              
+            ),
+            
+            # Main panel for displaying outputs ----
+            mainPanel(
+              
+              # Output: tsPlot on borough ----
+              plotOutput(outputId = "tsPlot1"),
+              
+              # Output: tsPlot on business type ----
+              plotOutput(outputId = "tsPlot2")
+              
+            )
+          )
+        )
+        ), 
     # ------------------ Appendix --------------------------------
         tabItem(tabName = "Appendix", fluidPage( 
             HTML(
