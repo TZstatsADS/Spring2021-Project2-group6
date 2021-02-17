@@ -296,3 +296,23 @@ Business_closed <- business_data %>% filter(status == "Inactive") %>%
   mutate(depth= ifelse(no <= 9, "light", 
                        ifelse(no <= 32 & no >9, "intermediate", 
                               ifelse(no > 32 & no <= 50 , "serious", "very serious"))))
+
+######## ----------- NYC Covid-19 Confirmed Cases data NEEDED ---------------~####
+
+Confirmed_case_data <- cases_by_day_data %>% 
+  pivot_longer(c("BX_CASE_COUNT", "BK_CASE_COUNT","MN_CASE_COUNT", "QN_CASE_COUNT", "SI_CASE_COUNT"),
+               names_to = "borough",
+               values_to = "cases")%>%
+  mutate(`borough` = ifelse(grepl("BX_CASE_COUNT",`borough`), "Bronx",
+                            ifelse(grepl("BK_CASE_COUNT",`borough`), "Brooklyn",
+                                   ifelse(grepl("MN_CASE_COUNT", `borough`), "Manhattan",
+                                          ifelse(grepl("QN_CASE_COUNT", `borough`), "Queens",
+                                                 ifelse(grepl("SI_CASE_COUNT", `borough`), "Staten Island", NA))))))%>%
+  rename(Date = date_of_interest)%>%
+  select(Date, borough, cases)
+
+Confirmed_case_data_new = Confirmed_case_data %>% 
+  rename( "borough1" = "borough" )
+
+Confirmed_case_data_closed =Confirmed_case_data %>% 
+  rename( "Borough1" = "borough" )
