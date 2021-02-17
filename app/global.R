@@ -1,13 +1,177 @@
-knitr::opts_chunk$set(echo = TRUE)
-# load packages needed
-require(tidyverse)
-require(dplyr)
+#--------------------------------------------------------------------
+###############################Install Related Packages #######################
+if (!require("dplyr")) {
+  install.packages("dplyr")
+  library(dplyr)
+}
+if (!require("tibble")) {
+  install.packages("tibble")
+  library(tibble)
+}
+if (!require("tidyverse")) {
+  install.packages("tidyverse")
+  library(tidyverse)
+}
+if (!require("shinythemes")) {
+  install.packages("shinythemes")
+  library(shinythemes)
+}
+
+if (!require("sf")) {
+  install.packages("sf")
+  library(sf)
+}
+if (!require("RCurl")) {
+  install.packages("RCurl")
+  library(RCurl)
+}
+if (!require("tmap")) {
+  install.packages("tmap")
+  library(tmap)
+}
+if (!require("rgdal")) {
+  install.packages("rgdal")
+  library(rgdal)
+}
+if (!require("leaflet")) {
+  install.packages("leaflet")
+  library(leaflet)
+}
+if (!require("shiny")) {
+  install.packages("shiny")
+  library(shiny)
+}
+if (!require("shinythemes")) {
+  install.packages("shinythemes")
+  library(shinythemes)
+}
+if (!require("plotly")) {
+  install.packages("plotly")
+  library(plotly)
+}
+if (!require("ggplot2")) {
+  install.packages("ggplot2")
+  library(ggplot2)
+}
+if (!require("viridis")) {
+  install.packages("viridis")
+  library(viridis)
+}
+
 require(lubridate)
-setwd("C:/Users/liqia/Spring2021-Project2-group-6/data") 
-lic = read_csv("License_Applications.csv")
-legal_b = read_csv("Legally_Operating_Businesses.csv")
+
+library(httr)
+library(rvest)
+library(stringr)
+library(jsonlite)
+#--------------------------------------------------------------------
+
+############################### NYC map data ###############################
+# Data Sources
+#   nyc Health data
+#
+# get NYC covid data based on Modified Zip code
+# First get ZCTA (zip code) to MODZCTA data:
+
+zcta_to_modzcta <- read.csv( "https://raw.githubusercontent.com/nychealth/coronavirus-data/master/Geography-resources/ZCTA-to-MODZCTA.csv" )
+
+# NYC Covid data by MODZCTA(cummulative):
+
+data_by_modzcta <- read.csv( 'https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/data-by-modzcta.csv' )
+
+# get data by nyc neighborhoods
+#----  total cases, death, total covid tests by each neighborhood
+nyc_neighborhoods <- data_by_modzcta %>%
+  select(
+    "MODIFIED_ZCTA","NEIGHBORHOOD_NAME", 
+    "BOROUGH_GROUP", "COVID_CASE_COUNT", 
+    "COVID_CASE_RATE", "PERCENT_POSITIVE", "COVID_DEATH_COUNT",
+    "TOTAL_COVID_TESTS"
+  )
+
+# import geojson file from NYC open data
+nyc_zipcode_geo <- sf::st_read("./output/ZIP_CODE_040114/ZIP_CODE_040114.shp") %>%
+  sf::st_transform('+proj=longlat +datum=WGS84')
+nyc_zipcode_geo$ZIPCODE <- type.convert(nyc_zipcode_geo$ZIPCODE)
+
+# import longitude and latitude data
+nyc_lat_data <- read.csv("./output/zc_geo.csv", sep= ";")
+
+nyc_lat_table<-nyc_lat_data %>%
+  select("Zip", "Latitude", "Longitude")
+
+# match zipcode with longitude and latitude data and merge new data
+nyc_neighborhoods <- nyc_neighborhoods %>%
+  mutate(
+    LAT_repre = nyc_lat_data$Latitude[
+      match(nyc_neighborhoods$MODIFIED_ZCTA, nyc_lat_data$Zip) ]
+  ) %>%
+  mutate(
+    LNG_repre = nyc_lat_data$Longitude[ 
+      match(nyc_neighborhoods$MODIFIED_ZCTA, nyc_lat_data$Zip) ]
+  )
+
+# data for line chart and positive rate
+
+nyc_recent_4w_cases <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/archive/recent-4-week-by-modzcta.csv")
+
+# recent_use_dat
+nyc_recent_4w_data <- nyc_recent_4w_cases %>%
+  select("MODIFIED_ZCTA","NEIGHBORHOOD_NAME","COVID_CASE_RATE_WEEK4",
+         "COVID_CASE_RATE_WEEK3","COVID_CASE_RATE_WEEK2","COVID_CASE_RATE_WEEK1",
+         "PERCENT_POSITIVE_4WEEK" )
+
+#data for positive rate in the last 7 days
+
+nyc_7days_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/latest/last7days-by-modzcta.csv")
+
+#7 days data that will be used
+nyc_7days_data <- nyc_7days_masterdata %>% 
+  select("modzcta", "modzcta_name", "percentpositivity_7day", 
+         "median_daily_test_rate")
+
+#data by day (death, confirmed cases, hospitalization) NOT CONCERNING ZIP CODE
+#----- Confirmed Cases--------
+
+cases_by_day_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/cases-by-day.csv")
+
+#confirmed cases by day and by borough if needed
+cases_by_day_data <- cases_by_day_masterdata %>%
+  select("date_of_interest", "CASE_COUNT", "BX_CASE_COUNT", "BK_CASE_COUNT",
+         "MN_CASE_COUNT", "QN_CASE_COUNT", "SI_CASE_COUNT")
+
+#death by day and borough if needed
+
+death_by_day_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/deaths-by-day.csv")
+
+death_by_day_data <- death_by_day_masterdata %>%
+  select("date_of_interest", "DEATH_COUNT", "BX_DEATH_COUNT",
+         "BK_DEATH_COUNT", "MN_DEATH_COUNT", "QN_DEATH_COUNT")
+
+#hospitalization by day and borough if needed
+
+hosp_by_day_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/hosp-by-day.csv")
+
+hosp_by_day_data <- hosp_by_day_masterdata %>%
+  select("date_of_interest", "HOSPITALIZED_COUNT", "BX_HOSPITALIZED_COUNT", 
+         "BK_HOSPITALIZED_COUNT", "MN_HOSPITALIZED_COUNT", 
+         "QN_HOSPITALIZED_COUNT", "SI_HOSPITALIZED_COUNT")
+
+#Data by race and sex and borough (cumulative)
+racesex_data_master <- as.data.frame(read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/group-data-by-boro.csv"))
+racesex_data <- racesex_data_master[c(0,13:18), ]
+
+
+
+#######-----------------NYC Business ---------------------#################
+
+lic <-  read_csv("./data/License_Applications.csv")
+legal_b <-  read_csv("./data/Legally_Operating_Businesses.csv")
+
 str(lic)
 str(legal_b)
+
+# group License application data into 4 industries
 lic%>%count(`License Category`, sort = TRUE)
 licence_app = lic %>% mutate(business_type = ifelse(grepl("Cafe", `License Category`), "food_beverage", 
                                                     ifelse(grepl("Catering", `License Category`), "food_beverage",
@@ -18,9 +182,13 @@ licence_app = lic %>% mutate(business_type = ifelse(grepl("Cafe", `License Categ
                                                                                        ifelse(grepl("Improvement", `License Category`), "service", ifelse(grepl("Sightseeing", `License Category`), "service", ifelse(grepl("Picture", `License Category`), "service", ifelse(grepl("Laundr", `License Category`), "service", ifelse(grepl("Locksmith", `License Category`), "service", ifelse(grepl("Serv", `License Category`), "service", ifelse(grepl("Agency", `License Category`), "service", ifelse(grepl("Garage", `License Category`), "service", ifelse(grepl("Driver", `License Category`), "service", ifelse(grepl("Business", `License Category`), "service", ifelse(grepl("Company", `License Category`), "service", ifelse(grepl("Wash", `License Category`), "service", ifelse(grepl("Tow", `License Category`), "service", ifelse(grepl("Parking", `License Category`), "service", ifelse(grepl("Auction", `License Category`), "service", ifelse(grepl("Pawnbroker", `License Category`), "service", ifelse(grepl("Processor", `License Category`), "service", ifelse(grepl("Owner", `License Category`), "service", ifelse(grepl("Repair", `License Category`), "service", ifelse(grepl("Lessor", `License Category`), "service", ifelse(grepl("Distributor", `License Category`), "service", ifelse(grepl("Storage", `License Category`), "service", "retail")))))))))))))))))))))))))))),
                              ID = gsub("-DCA" , "" ,`License Number`)) %>%
   filter(State == "NY") %>%
-  select(ID, name = `Business Name`, new_renewl = `Application or Renewal`, start_date = `Start Date`,end_date = `End Date`, business_type, license_cate = `License Category`, zip = Zip) %>%
+  select(ID, name = `Business Name`, NeworOld= `Application or Renewal`, end_date = `End Date`, start_date = `Start Date`, business_type, license_cate = `License Category`, zip = Zip) %>%
   drop_na()
 str(licence_app)
+#head(licence_app)
+
+#group legal business data into 4 industries
+
 legal_business = legal_b %>% mutate(business_type = ifelse(grepl("Cafe", `Industry`), "food_beverage", 
                                                            ifelse(grepl("Catering", `Industry`), "food_beverage",
                                                                   ifelse(grepl("Amusement", `Industry`), "entertainment",
@@ -38,22 +206,22 @@ legal_business = legal_b %>% mutate(business_type = ifelse(grepl("Cafe", `Indust
   select(ID, name = `Business Name`, status = `License Status`, creation = `License Creation Date`, expiration = `License Expiration Date`, business_type, licence_cate = Industry, borough = `Borough Code`, zip = `Address ZIP`) %>%
   drop_na()
 str(legal_business)
+date = legal_business %>% filter(status == "Active") %>% 
+  mutate(expiration = mdy(expiration)) %>% 
+  select(expiration)
 
-date = legal_business %>% filter(status == "Active") %>% mutate(expiration = mdy(expiration)) %>% select(expiration)
-summary(date)
-business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)%>% filter(status == "Inactive")
+#join 2 business data
+#join 2 business data
+business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
 
-close_bus_reta = business_data  %>% filter(grepl("2020", expiration) | grepl("2019", expiration), business_type == "retail")
-close_bus_serv = business_data  %>% filter(grepl("2020", expiration) | grepl("2019", expiration), business_type == "service")
-close_bus_f_b = business_data  %>% filter(grepl("2020", expiration) | grepl("2019", expiration), business_type == "food_beverage")
-close_bus_ent = business_data  %>% filter(grepl("2020", expiration) | grepl("2019", expiration), business_type == "entertainment")
-data = business_data  %>% filter(grepl("2020", expiration) | grepl("2019", expiration), borough == "Staten Island")
-data = data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))
-plot(data$n, type = "o", pch = 22, lty = 1, pty = 2, 
-     ylab = "monthly closed business", 
-     main = "Business closed by month from 2019 to 2020")
-axis.Date(1, at=seq(as.Date("01-01-2019"), as.Date("12-01-2020"), by="months"), format="%m-%Y")
-plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2)
-axis.Date(1, at = data$date, format= "%m-%Y", las = 1)
+business_data_closed = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)%>% filter(status == "Inactive")
+######## ----------- NYC business data NEEDED ---------------~####
 
-
+Business_closed <- business_data %>% filter(status == "Inactive") %>% 
+  filter(grepl("2020",expiration)) %>%
+  select(name, business_type, borough, zip, expiration) %>%
+  group_by(zip=as.integer(zip)) %>%
+  summarize(no=n()) %>%
+  mutate(depth= ifelse(no <= 9, "light", 
+                       ifelse(no <= 32 & no >9, "intermediate", 
+                              ifelse(no > 32 & no <= 50 , "serious", "very serious"))))
