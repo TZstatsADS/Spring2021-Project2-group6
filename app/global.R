@@ -211,7 +211,7 @@ date = legal_business %>% filter(status == "Active") %>%
 #join 2 business data
 business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
 
-business_data_closed = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)%>% filter(status == "Inactive")
+
 ######## ----------- NYC business data NEEDED ---------------~####
 
 Business_closed <- business_data %>% filter(status == "Inactive") %>% 
