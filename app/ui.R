@@ -63,6 +63,10 @@ body <- dashboardBody(
                 sidebarPanel(
                     
                     # Input: Select for the borough ----
+                    selectInput(inputId = "borough1",
+                                label = "Choose a borough:",
+                                choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+                  
                     selectInput(inputId = "borough",
                                 label = "Choose a borough:",
                                 choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
@@ -76,6 +80,9 @@ body <- dashboardBody(
                 
                 # Main panel for displaying outputs ----
                 mainPanel(
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot0"),
                     
                     # Output: tsPlot on borough ----
                     plotOutput(outputId = "tsPlot1"),
@@ -98,6 +105,10 @@ body <- dashboardBody(
                 
                 # Sidebar panel for inputs ----
                 sidebarPanel(
+                    # Input: Select for the borough ----
+                    selectInput(inputId = "Borough1",
+                                label = "Choose a borough:",
+                                choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
                     
                     # Input: Select for the borough ----
                     selectInput(inputId = "Borough",
@@ -114,6 +125,9 @@ body <- dashboardBody(
                 
                 # Main panel for displaying outputs ----
                 mainPanel(
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot_Covid_closed"),
                     
                     # Output: tsPlot on borough ----
                     plotOutput(outputId = "tsPlot_closed_borough"),
