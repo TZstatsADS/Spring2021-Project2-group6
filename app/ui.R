@@ -1,25 +1,17 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
 
+
+#load('./output/covid-19.RData')
+library(viridis)
+library(dplyr)
+library(tibble)
+library(tidyverse)
+library(shinythemes)
+library(sf)
+library(RCurl)
+library(tmap)
+library(rgdal)
+library(leaflet)
 library(shiny)
-<<<<<<< HEAD
-ui <- fluidPage(
-    
-    # App title ----
-    titlePanel("Business Closed"),
-    
-    # Sidebar layout with input and output definitions ----
-    sidebarLayout(
-        
-        # Sidebar panel for inputs ----
-        sidebarPanel(
-=======
 library(shinythemes)
 library(plotly)
 library(ggplot2)
@@ -106,33 +98,9 @@ body <- dashboardBody(
                 <h4><li>NYC Minority Owned Business : <a href='https://data.cityofnewyork.us/Business/M-WBE-LBE-and-EBE-Certified-Business-List/ci93-uc8s' target='_blank'>NYC Health + Hospitals</a></li></h4>
                 <h4><li>NYC Geo Data : <a href='https://github.com/ResidentMario/geoplot-data-old' target='_blank'> Geoplot Github</a></li></h4>"
             ),
->>>>>>> 35dfe6585ddf0921397673764bee3c43853a2166
             
-            # Input: Select for the borough ----
-            selectInput(inputId = "borough",
-                        label = "Choose a borough:",
-                        choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+            titlePanel("Disclaimers "),
             
-<<<<<<< HEAD
-            # Input: Select for the business type ----
-            selectInput(inputId = "business_type",
-                        label = "Choose a business type:",
-                        choices = c("retail", "service", "food and beverage", "entertainment"))
-            
-        ),
-        
-        # Main panel for displaying outputs ----
-        mainPanel(
-            
-            # Output: tsPlot on borough ----
-            plotOutput(outputId = "tsPlot1"),
-            
-            # Output: tsPlot on business type ----
-            plotOutput(outputId = "tsPlot2")
-            
-        )
-    )
-=======
             titlePanel("Acknowledgement  "),
             
             HTML(
@@ -172,7 +140,5 @@ ui <- dashboardPage(
         menuItem("Appendix", tabName = "Appendix", icon = icon("fas fa-asterisk"))
     )),
     body 
->>>>>>> 35dfe6585ddf0921397673764bee3c43853a2166
 )
-
 
