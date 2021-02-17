@@ -215,19 +215,26 @@ date = legal_business %>% filter(status == "Active") %>%
 business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
 
 business_data_closed = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)%>% filter(status == "Inactive")
+
+business_data_closed = business_data_closed %>% 
+  rename( "Borough" = "borough",
+          "Business_type" = "business_type"
+  )
+
+
 ######## ----------- NYC business data NEEDED ---------------~####
 
-business_type_sum_2022= business_data_closed%>%filter(grepl("2022", expiration)) %>% group_by(business_type) %>% summarise("2022"=n())
-business_type_sum_2021= business_data_closed%>%filter(grepl("2021", expiration)) %>% group_by(business_type) %>% summarise("2021"=n())
-business_type_sum_2019= business_data_closed%>%filter(grepl("2019", expiration)) %>% group_by(business_type) %>% summarise("2019"=n())
-business_type_sum_2020= business_data_closed%>%filter(grepl("2020", expiration)) %>% group_by(business_type) %>% summarise("2020"=n())
-business_type_sum_2018= business_data_closed%>%filter(grepl("2018", expiration)) %>% group_by(business_type) %>% summarise("2018"=n())
-business_type_sum_2017= business_data_closed%>%filter(grepl("2017", expiration)) %>% group_by(business_type) %>% summarise("2017"=n())
-business_type_sum_2016= business_data_closed%>%filter(grepl("2016", expiration)) %>% group_by(business_type) %>% summarise("2016"=n())
-business_type_sum_2015= business_data_closed%>%filter(grepl("2015", expiration)) %>% group_by(business_type) %>% summarise("2015"=n())
-business_type_sum_2014= business_data_closed%>%filter(grepl("2014", expiration)) %>% group_by(business_type) %>% summarise("2014"=n())
-business_type_sum_2013= business_data_closed%>%filter(grepl("2013", expiration)) %>% group_by(business_type) %>% summarise("2013"=n())
-business_type_sum_2012= business_data_closed%>%filter(grepl("2012", expiration)) %>% group_by(business_type) %>% summarise("2012"=n())
+business_type_sum_2022= business_data_closed%>%filter(grepl("2022", expiration)) %>% group_by(Business_type) %>% summarise("2022"=n())
+business_type_sum_2021= business_data_closed%>%filter(grepl("2021", expiration)) %>% group_by(Business_type) %>% summarise("2021"=n())
+business_type_sum_2019= business_data_closed%>%filter(grepl("2019", expiration)) %>% group_by(Business_type) %>% summarise("2019"=n())
+business_type_sum_2020= business_data_closed%>%filter(grepl("2020", expiration)) %>% group_by(Business_type) %>% summarise("2020"=n())
+business_type_sum_2018= business_data_closed%>%filter(grepl("2018", expiration)) %>% group_by(Business_type) %>% summarise("2018"=n())
+business_type_sum_2017= business_data_closed%>%filter(grepl("2017", expiration)) %>% group_by(Business_type) %>% summarise("2017"=n())
+business_type_sum_2016= business_data_closed%>%filter(grepl("2016", expiration)) %>% group_by(Business_type) %>% summarise("2016"=n())
+business_type_sum_2015= business_data_closed%>%filter(grepl("2015", expiration)) %>% group_by(Business_type) %>% summarise("2015"=n())
+business_type_sum_2014= business_data_closed%>%filter(grepl("2014", expiration)) %>% group_by(Business_type) %>% summarise("2014"=n())
+business_type_sum_2013= business_data_closed%>%filter(grepl("2013", expiration)) %>% group_by(Business_type) %>% summarise("2013"=n())
+business_type_sum_2012= business_data_closed%>%filter(grepl("2012", expiration)) %>% group_by(Business_type) %>% summarise("2012"=n())
 
 business_type_sum1 = left_join(business_type_sum_2021,business_type_sum_2022)
 business_type_sum2 = left_join(business_type_sum_2020,business_type_sum1)
@@ -250,17 +257,19 @@ a = t(business_type_sum[,2:10])
 #    axis(side=1,at=1:9,labels=c("2012","2013","2014","2015","2016","2017","2018","2019","2020"),cex.axis=0.6)+
 # legend(x="topright",legend= c("retail","service","food and beverage","entertainment"),lty=1:4,col=1:4,text.width = 1,cex=0.7)
 
-borough_sum_2022= business_data_closed%>%filter(grepl("2022", expiration)) %>% group_by(borough) %>% summarise("2022"=n())
-borough_sum_2021= business_data_closed%>%filter(grepl("2021", expiration)) %>% group_by(borough) %>% summarise("2021"=n())
-borough_sum_2019= business_data_closed%>%filter(grepl("2019", expiration)) %>% group_by(borough) %>% summarise("2019"=n())
-borough_sum_2020= business_data_closed%>%filter(grepl("2020", expiration)) %>% group_by(borough) %>% summarise("2020"=n())
-borough_sum_2018= business_data_closed%>%filter(grepl("2018", expiration)) %>% group_by(borough) %>% summarise("2018"=n())
-borough_sum_2017= business_data_closed%>%filter(grepl("2017", expiration)) %>% group_by(borough) %>% summarise("2017"=n())
-borough_sum_2016= business_data_closed%>%filter(grepl("2016", expiration)) %>% group_by(borough) %>% summarise("2016"=n())
-borough_sum_2015= business_data_closed%>%filter(grepl("2015", expiration)) %>% group_by(borough) %>% summarise("2015"=n())
-borough_sum_2014= business_data_closed%>%filter(grepl("2014", expiration)) %>% group_by(borough) %>% summarise("2014"=n())
-borough_sum_2013= business_data_closed%>%filter(grepl("2013", expiration)) %>% group_by(borough) %>% summarise("2013"=n())
-borough_sum_2012= business_data_closed%>%filter(grepl("2012", expiration)) %>% group_by(borough) %>% summarise("2012"=n())
+
+
+borough_sum_2022= business_data_closed%>%filter(grepl("2022", expiration)) %>% group_by(Borough) %>% summarise("2022"=n())
+borough_sum_2021= business_data_closed%>%filter(grepl("2021", expiration)) %>% group_by(Borough) %>% summarise("2021"=n())
+borough_sum_2019= business_data_closed%>%filter(grepl("2019", expiration)) %>% group_by(Borough) %>% summarise("2019"=n())
+borough_sum_2020= business_data_closed%>%filter(grepl("2020", expiration)) %>% group_by(Borough) %>% summarise("2020"=n())
+borough_sum_2018= business_data_closed%>%filter(grepl("2018", expiration)) %>% group_by(Borough) %>% summarise("2018"=n())
+borough_sum_2017= business_data_closed%>%filter(grepl("2017", expiration)) %>% group_by(Borough) %>% summarise("2017"=n())
+borough_sum_2016= business_data_closed%>%filter(grepl("2016", expiration)) %>% group_by(Borough) %>% summarise("2016"=n())
+borough_sum_2015= business_data_closed%>%filter(grepl("2015", expiration)) %>% group_by(Borough) %>% summarise("2015"=n())
+borough_sum_2014= business_data_closed%>%filter(grepl("2014", expiration)) %>% group_by(Borough) %>% summarise("2014"=n())
+borough_sum_2013= business_data_closed%>%filter(grepl("2013", expiration)) %>% group_by(Borough) %>% summarise("2013"=n())
+borough_sum_2012= business_data_closed%>%filter(grepl("2012", expiration)) %>% group_by(Borough) %>% summarise("2012"=n())
 
 borough_sum1 = left_join(borough_sum_2021,borough_sum_2022)
 borough_sum2 = left_join(borough_sum_2020,borough_sum1)
