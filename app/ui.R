@@ -17,6 +17,8 @@ library(plotly)
 library(ggplot2)
 library(shinydashboard)
 
+
+# Define UI ----
 body <- dashboardBody(
     
     tabItems(
@@ -42,7 +44,6 @@ body <- dashboardBody(
                          ))
             ))
         )), # end of home 
-        
         # ------------------ Map-----------------------------------
         tabItem(tabName = "Map",
                 h2("How Many Business Were Closed In Each Neighborhood?", align = 'center'),
@@ -77,6 +78,9 @@ body <- dashboardBody(
                 mainPanel(
                     
                     # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot0"),
+                    
+                    # Output: tsPlot on borough ----
                     plotOutput(outputId = "tsPlot1"),
                     
                     # Output: tsPlot on business type ----
@@ -86,6 +90,60 @@ body <- dashboardBody(
             )
         )
         ), 
+
+        #------------------closed Business----------------------------
+        tabItem(tabName = "Closed_Business", fluidPage(
+            
+            # App title ----
+            titlePanel("Closed Business"),
+            
+            # Sidebar layout with input and output definitions ----
+            sidebarLayout(
+                
+                # Sidebar panel for inputs ----
+                sidebarPanel(
+                    # Input: Select for the borough ----
+                    
+                    
+                    # Input: Select for the borough ----
+                    selectInput(inputId = "Borough",
+                                label = "Choose a borough:",
+                                choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+                    
+                    # Input: Select for the business type ----
+                    selectInput(inputId = "Business_type",
+                                label = "Choose a business type:",
+                                choices = c("retail", "service", "food and beverage", "entertainment")),
+                    numericInput("obs", "lines", 5)
+                    
+                ),
+                
+                # Main panel for displaying outputs ----
+                mainPanel(
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot00"),
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot_closed_borough"),
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot_borough"),
+                    
+                    tableOutput("view"),
+                    
+                    # Output: tsPlot on business type ----
+                    plotOutput(outputId = "tsPlot_closed_business_type"),
+                    
+                    # Output: tsPlot on business type ----
+                    plotOutput(outputId = "tsPlot_business_type")
+                )
+            )
+        )
+        ),
+        
+
+
         
         # ------------------ Appendix --------------------------------
         tabItem(tabName = "Appendix", fluidPage( 
@@ -100,6 +158,11 @@ body <- dashboardBody(
             ),
             
             titlePanel("Disclaimers "),
+            
+            HTML(
+                " <p>We drew our business insights from NYC Open data, specifically business expiration databases. We recognized that there would be a lag between when the business is closed and when the expiration date, status are updated.</p>",
+                " <p>Thus our app may understate the number of businesses that were actually closed. Furthermore, due to the lag between the time point where the business were closed, with when the expiration date be updated, there could be some uncertainty to define on which day, month the businesses were fully closed
+ </p>"),
             
             titlePanel("Acknowledgement  "),
             
@@ -141,4 +204,3 @@ ui <- dashboardPage(
     )),
     body 
 )
-

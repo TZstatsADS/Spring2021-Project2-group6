@@ -14,9 +14,9 @@
 #update data with automated script
 #source("global.R") 
 #load('./output/covid-19.RData')
+# Define server ----
+
 shinyServer(function(input, output) {
-        
-        
         ####################### Tab 2 Map ##################
         map_base <-
                 leaflet(options = leafletOptions(dragging = T, minZoom = 10, maxZoom = 16)) %>%
@@ -73,63 +73,275 @@ shinyServer(function(input, output) {
         # end of tab
         
         
+
+        ####################### Tab 3 New Business ##################
+        
+        Confirmed_case <- reactive({
+                if ( "Manhattan" %in% input$borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Manhattan")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Bronx" %in% input$borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Bronx")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Brooklyn" %in% input$borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Brooklyn")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Queens" %in% input$borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Queens")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Staten Island" %in% input$borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Staten Island")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+        })
+        
+
+
         business_type_data <- reactive({
                 if ( "retail" %in% input$business_type){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), business_type == "retail")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))) 
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        business_type == "retail",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))) 
                 }
                 if ( "service" %in% input$business_type){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), business_type == "service")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        business_type == "retail",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
                 if ( "food and beverage" %in% input$business_type){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), business_type == "food_beverage")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        business_type == "retail",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
                 if ( "entertainment" %in% input$business_type){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), business_type == "entertainment")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        business_type == "retail",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
         })
         
         borough_data <- reactive({
                 if ( "Manhattan" %in% input$borough){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), borough == "Manhattan")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))) 
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        borough == "Manhattan",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))) 
                 }
                 if ( "Bronx" %in% input$borough){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), borough == "Bronx")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        borough == "Bronx",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
                 if ( "Brooklyn" %in% input$borough){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), borough == "Brooklyn")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        borough == "Brooklyn",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
                 if ( "Queens" %in% input$borough){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), borough == "Queens")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        borough == "Queens",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
                 if ( "Staten Island" %in% input$borough){
-                        data = business_data %>% filter(grepl("2020", creation) | grepl("2019", creation), borough == "Staten Island")
-                        return(data %>% count(date = format(as.Date(creation, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                        data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
+                                                        borough == "Staten Island",
+                                                        NeworOld == "Application")
+                        return(data %>% count(date = format(as.Date(start_date, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
+        })
+        
+        output$tsPlot0 <- renderPlot({
+                data = Confirmed_case()
+                plot(num ~ as.Date(month), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2,
+                     ylab = "monthly confirmed cases", xlab = "",
+                     main = paste("Number of confirmed cases in ",  input$borough))
+                axis.Date(1, at = data$month, format= "%m-%Y", las = 1)
         })
         
         output$tsPlot1 <- renderPlot({
-                data = borough_data()
-                plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, 
+                borough_data = borough_data()
+                plot(n ~ as.Date(date), borough_data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, 
                      ylab = "monthly new business", xlab = "",
                      main = paste("Number of new business created in ",  
                                   input$borough, " from 2019 to 2020"))
-                axis.Date(1, at = data$date, format= "%m-%Y", las = 1)
+                abline(v = c(as.Date("2020/03/01","%Y/%m/%d"), 
+                             as.Date("2020/06/01","%Y/%m/%d"),
+                             as.Date("2020/07/01","%Y/%m/%d"),
+                             as.Date("2020/09/01","%Y/%m/%d")), 
+                       col = c("red","purple","green","blue"))
+                legend("topright", legend=c("Non Essentials Stay Home", "Phase 1 & 2 Reopening",
+                                            "Phase 2 & 3 Reopening", "Phase 4 Reopening"),
+                       col=c("red","purple","green","blue"), lty=1, cex=0.8)
+                axis.Date(1, at = borough_data$date, format= "%m-%Y", las = 1)
         })
         
         output$tsPlot2 <- renderPlot({
-                data = business_type_data()
-                plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, 
+                business_type_data = business_type_data()
+                plot(n ~ as.Date(date), business_type_data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, 
                      ylab = "monthly new business", xlab = "",
                      main = paste("Number of ", 
                                   input$business_type, " business created in NYC from 2019 to 2020"))
+                abline(v = c(as.Date("2020/03/01","%Y/%m/%d"), 
+                             as.Date("2020/06/01","%Y/%m/%d"),
+                             as.Date("2020/07/01","%Y/%m/%d"),
+                             as.Date("2020/09/01","%Y/%m/%d")), 
+                       col = c("red","purple","green","blue"))
+                legend("topright", legend=c("Non Essentials Stay Home", "Phase 1 & 2 Reopening",
+                                            "Phase 2 & 3 Reopening", "Phase 4 Reopening"),
+                       col=c("red","purple","green","blue"), lty=1, cex=0.8)
+                axis.Date(1, at = business_type_data$date, format= "%m-%Y", las = 1)
+        })
+
+        
+        ####################### Tab 4 Closed Business ##################       
+        
+        
+        business_type_data_closed <- reactive({
+                if ( "retail" %in% input$Business_type){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Business_type == "retail")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))) 
+                }
+                if ( "service" %in% input$Business_type){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Business_type == "service")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+                if ( "food and beverage" %in% input$Business_type){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Business_type == "food_beverage")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+                if ( "entertainment" %in% input$Business_type){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Business_type == "entertainment")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+        })
+        
+        borough_data_closed <- reactive({
+                if ( "Manhattan" %in% input$Borough){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Borough == "Manhattan")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = ""))) 
+                }
+                if ( "Bronx" %in% input$Borough){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Borough == "Bronx")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+                if ( "Brooklyn" %in% input$Borough){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Borough == "Brooklyn")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+                if ( "Queens" %in% input$Borough){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Borough == "Queens")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+                if ( "Staten Island" %in% input$Borough){
+                        data = business_data_closed %>% filter(grepl("2020", expiration) | grepl("2019", expiration), Borough == "Staten Island")
+                        return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
+                }
+        })
+        
+        Confirmed_case_c <- reactive({
+                if ( "Manhattan" %in% input$Borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Manhattan")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Bronx" %in% input$Borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Bronx")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Brooklyn" %in% input$Borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Brooklyn")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Queens" %in% input$Borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Queens")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Staten Island" %in% input$Borough){
+                        data = Confirmed_case_data_closed %>% filter(borough1 == "Staten Island")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+        })
+        
+        output$tsPlot00 <- renderPlot({
+                data = Confirmed_case_c()
+                plot(num ~ as.Date(month), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2,
+                     ylab = "monthly confirmed cases", xlab = "",
+                     main = paste("Number of confirmed cases in ",  input$Borough))
+                axis.Date(1, at = data$month, format= "%m-%Y", las = 1)
+        })
+        
+        output$tsPlot_closed_borough <- renderPlot({
+                data = borough_data_closed()
+                plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, 
+                     ylab = "monthly business closed", xlab = "",
+                     main = paste("Number of  business closed in ",  input$Borough, " from 2019 to 2020"))
+                abline(v = c(as.Date("2020/03/01","%Y/%m/%d"), 
+                             as.Date("2020/06/01","%Y/%m/%d"),
+                             as.Date("2020/07/01","%Y/%m/%d"),
+                             as.Date("2020/09/01","%Y/%m/%d")), 
+                       col = c("red","purple","green","blue"))
+                legend("topright", legend=c("Non Essentials Stay Home", "Phase 1 & 2 Reopening",
+                                            "Phase 2 & 3 Reopening", "Phase 4 Reopening"),
+                       col=c("red","purple","green","blue"), lty=1, cex=0.8)
                 axis.Date(1, at = data$date, format= "%m-%Y", las = 1)
         })
+        
+        
+        output$tsPlot_borough <- renderPlot({
+                data = borough_sum
+                matplot(t(borough_sum[,2:10]),type="b",lty=1:5,col=1:5,xlab = "years",ylab = "went out of business",main = paste("Business closed 5 boroughs"),pch=1,xaxt="n")+
+                        axis(side=1,at=1:9,labels=c("2012","2013","2014","2015","2016","2017","2018","2019","2020"),cex.axis=0.6)
+                legend(x="topright",legend= c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"),lty=1:5,col=1:5,text.width = 1,cex=0.7)
+        })
+        #show data
+        output$view <- renderTable({
+                data = borough_sum_closed
+                head(data, n = input$obs)
+        })
+        
+        output$tsPlot_closed_business_type <- renderPlot({
+                data = business_type_data_closed()
+                plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, ylab = "monthly new business", xlab = "",
+                     main = paste("Number of ",  input$Business_type, " business closed in NYC from 2019 to 2020"))
+                abline(v = c(as.Date("2020/03/01","%Y/%m/%d"), 
+                             as.Date("2020/06/01","%Y/%m/%d"),
+                             as.Date("2020/07/01","%Y/%m/%d"),
+                             as.Date("2020/09/01","%Y/%m/%d")), 
+                       col = c("red","purple","green","blue"))
+                legend("topright", legend=c("Non Essentials Stay Home", "Phase 1 & 2 Reopening",
+                                            "Phase 2 & 3 Reopening", "Phase 4 Reopening"),
+                       col=c("red","purple","green","blue"), lty=1, cex=0.8)
+                axis.Date(1, at = data$date, format= "%m-%Y", las = 1)
+        })
+        
+        
+        output$tsPlot_business_type <- renderPlot({
+                data = business_type_sum
+                matplot(t(business_type_sum[,2:10]),type="b",lty=1:4,col=1:4,xlab = "years",ylab = "went out of business",main = paste("Business closed 4 business type"),pch=1,xaxt="n")+
+                        axis(side=1,at=1:9,labels=c("2012","2013","2014","2015","2016","2017","2018","2019","2020"),cex.axis=0.6)
+                legend(x="topright",legend= c("entertainment","food and beverage","retail","service"),lty=1:4,col=1:4,text.width = 1,cex=0.7)
+        })
 })
+
+})
+
