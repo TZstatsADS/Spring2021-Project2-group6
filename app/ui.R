@@ -86,6 +86,43 @@ body <- dashboardBody(
             )
         )
         ), 
+        #------------------Closed Business----------------------------
+        tabItem(tabName = "Closed_Business", fluidPage(
+            
+            # App title ----
+            titlePanel("Closed Business"),
+            
+            # Sidebar layout with input and output definitions ----
+            sidebarLayout(
+                
+                # Sidebar panel for inputs ----
+                sidebarPanel(
+                    
+                    # Input: Select for the borough ----
+                    selectInput(inputId = "borough_closed",
+                                label = "Choose a borough:",
+                                choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
+                    
+                    # Input: Select for the business type ----
+                    selectInput(inputId = "business_type_closed",
+                                label = "Choose a business type:",
+                                choices = c("retail", "service", "food and beverage", "entertainment"))
+                    
+                ),
+                
+                # Main panel for displaying outputs ----
+                mainPanel(
+                    
+                    # Output: tsPlot on borough ----
+                    plotOutput(outputId = "tsPlot3"),
+                    
+                    # Output: tsPlot on business type ----
+                    plotOutput(outputId = "tsPlot4")
+                    
+                )
+            )
+        )
+        ), 
         
         # ------------------ Appendix --------------------------------
         tabItem(tabName = "Appendix", fluidPage( 
@@ -137,6 +174,7 @@ ui <- dashboardPage(
         menuItem("Home", tabName = "Home", icon = icon("home")),
         menuItem("Map", tabName = "Map", icon = icon("compass")),
         menuItem("New Business", tabName = "New_Business", icon = icon("dollar-sign")),
+        menuItem("Closed Business", tabName = "Closed_Business", icon = icon("dollar-sign")),
         menuItem("Appendix", tabName = "Appendix", icon = icon("fas fa-asterisk"))
     )),
     body 
