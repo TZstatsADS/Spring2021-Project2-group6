@@ -30,7 +30,7 @@ Term: Spring 2021
 
 + **Project summary**: This App is designed for the people who are interested in the influence of coronavirus on the small business in NYC. Specifically, people can use this App to check how many new businesses were created, how many business were closed during the pandemic and how many confirmed cases in each borough in NYC. We divide the small business into four different types: Entertainment, Food and Beverage, Retail and Service. 
 
-+ **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
++ **Contribution statement**: ([default](doc/a_note_on_contributions.md)) Wendy, Qizhen, Yandong and Qiao designed the study. Wendy mainly contributes to the Home, Map and Appendix page in the App. Yandong contributes to the graphs on the number of new business created in NYC and different borough. Qiao contributes to the graphs on the number of business closed in NYC and different borough. Qizhen contributes to the graphs on the monthly confirmed cases in different borough in NYC and plan the group meeting. James contributes to the presentation. Every member helps each other to debug the codes.  
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
