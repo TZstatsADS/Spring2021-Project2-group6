@@ -60,6 +60,10 @@ if (!require("viridis")) {
 
 require(lubridate)
 
+library(httr)
+library(rvest)
+library(stringr)
+library(jsonlite)
 #--------------------------------------------------------------------
 
 ############################### NYC map data ###############################
@@ -68,12 +72,12 @@ require(lubridate)
 #
 # get NYC covid data based on Modified Zip code
 # First get ZCTA (zip code) to MODZCTA data:
-zcta_to_modzctaURL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/Geography-resources/ZCTA-to-MODZCTA.csv")
-zcta_to_modzcta <- read.csv( text=zcta_to_modzctaURL )
+
+zcta_to_modzcta <- read.csv( "https://raw.githubusercontent.com/nychealth/coronavirus-data/master/Geography-resources/ZCTA-to-MODZCTA.csv" )
 
 # NYC Covid data by MODZCTA(cummulative):
-data_by_modzctaURL <- getURL('https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/data-by-modzcta.csv')
-data_by_modzcta <- read.csv( text=data_by_modzctaURL )
+
+data_by_modzcta <- read.csv( 'https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/data-by-modzcta.csv' )
 
 # get data by nyc neighborhoods
 #----  total cases, death, total covid tests by each neighborhood
@@ -108,8 +112,8 @@ nyc_neighborhoods <- nyc_neighborhoods %>%
   )
 
 # data for line chart and positive rate
-nyc_recent_4w_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/archive/recent-4-week-by-modzcta.csv")
-nyc_recent_4w_cases <- read.csv(text = nyc_recent_4w_URL)
+
+nyc_recent_4w_cases <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/archive/recent-4-week-by-modzcta.csv")
 
 # recent_use_dat
 nyc_recent_4w_data <- nyc_recent_4w_cases %>%
@@ -118,8 +122,8 @@ nyc_recent_4w_data <- nyc_recent_4w_cases %>%
          "PERCENT_POSITIVE_4WEEK" )
 
 #data for positive rate in the last 7 days
-nyc_7days_URL <-getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/latest/last7days-by-modzcta.csv")
-nyc_7days_masterdata <- read.csv(text=nyc_7days_URL)
+
+nyc_7days_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/latest/last7days-by-modzcta.csv")
 
 #7 days data that will be used
 nyc_7days_data <- nyc_7days_masterdata %>% 
@@ -128,8 +132,8 @@ nyc_7days_data <- nyc_7days_masterdata %>%
 
 #data by day (death, confirmed cases, hospitalization) NOT CONCERNING ZIP CODE
 #----- Confirmed Cases--------
-cases_by_day_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/cases-by-day.csv")
-cases_by_day_masterdata <- read.csv(text=cases_by_day_URL)
+
+cases_by_day_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/cases-by-day.csv")
 
 #confirmed cases by day and by borough if needed
 cases_by_day_data <- cases_by_day_masterdata %>%
@@ -137,16 +141,16 @@ cases_by_day_data <- cases_by_day_masterdata %>%
          "MN_CASE_COUNT", "QN_CASE_COUNT", "SI_CASE_COUNT")
 
 #death by day and borough if needed
-death_by_day_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/deaths-by-day.csv")
-death_by_day_masterdata <- read.csv(text=death_by_day_URL)
+
+death_by_day_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/deaths-by-day.csv")
 
 death_by_day_data <- death_by_day_masterdata %>%
   select("date_of_interest", "DEATH_COUNT", "BX_DEATH_COUNT",
          "BK_DEATH_COUNT", "MN_DEATH_COUNT", "QN_DEATH_COUNT")
 
 #hospitalization by day and borough if needed
-hosp_by_day_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/hosp-by-day.csv")
-hosp_by_day_masterdata <- read.csv(text=hosp_by_day_URL)
+
+hosp_by_day_masterdata <- read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/trends/hosp-by-day.csv")
 
 hosp_by_day_data <- hosp_by_day_masterdata %>%
   select("date_of_interest", "HOSPITALIZED_COUNT", "BX_HOSPITALIZED_COUNT", 
@@ -154,8 +158,7 @@ hosp_by_day_data <- hosp_by_day_masterdata %>%
          "QN_HOSPITALIZED_COUNT", "SI_HOSPITALIZED_COUNT")
 
 #Data by race and sex and borough (cumulative)
-racesex_data_URL <- getURL("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/group-data-by-boro.csv")
-racesex_data_master <- as.data.frame(read.csv(text=racesex_data_URL))
+racesex_data_master <- as.data.frame(read.csv("https://raw.githubusercontent.com/nychealth/coronavirus-data/master/totals/group-data-by-boro.csv"))
 racesex_data <- racesex_data_master[c(0,13:18), ]
 
 
@@ -212,7 +215,78 @@ date = legal_business %>% filter(status == "Active") %>%
 business_data = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)
 
 business_data_closed = left_join(legal_business, licence_app) %>% distinct(ID, .keep_all = TRUE)%>% filter(status == "Inactive")
+
+business_data_closed = business_data_closed %>% 
+  rename( "Borough" = "borough",
+          "Business_type" = "business_type"
+  )
+
+
 ######## ----------- NYC business data NEEDED ---------------~####
+
+business_type_sum_2022= business_data_closed%>%filter(grepl("2022", expiration)) %>% group_by(Business_type) %>% summarise("2022"=n())
+business_type_sum_2021= business_data_closed%>%filter(grepl("2021", expiration)) %>% group_by(Business_type) %>% summarise("2021"=n())
+business_type_sum_2019= business_data_closed%>%filter(grepl("2019", expiration)) %>% group_by(Business_type) %>% summarise("2019"=n())
+business_type_sum_2020= business_data_closed%>%filter(grepl("2020", expiration)) %>% group_by(Business_type) %>% summarise("2020"=n())
+business_type_sum_2018= business_data_closed%>%filter(grepl("2018", expiration)) %>% group_by(Business_type) %>% summarise("2018"=n())
+business_type_sum_2017= business_data_closed%>%filter(grepl("2017", expiration)) %>% group_by(Business_type) %>% summarise("2017"=n())
+business_type_sum_2016= business_data_closed%>%filter(grepl("2016", expiration)) %>% group_by(Business_type) %>% summarise("2016"=n())
+business_type_sum_2015= business_data_closed%>%filter(grepl("2015", expiration)) %>% group_by(Business_type) %>% summarise("2015"=n())
+business_type_sum_2014= business_data_closed%>%filter(grepl("2014", expiration)) %>% group_by(Business_type) %>% summarise("2014"=n())
+business_type_sum_2013= business_data_closed%>%filter(grepl("2013", expiration)) %>% group_by(Business_type) %>% summarise("2013"=n())
+business_type_sum_2012= business_data_closed%>%filter(grepl("2012", expiration)) %>% group_by(Business_type) %>% summarise("2012"=n())
+
+business_type_sum1 = left_join(business_type_sum_2021,business_type_sum_2022)
+business_type_sum2 = left_join(business_type_sum_2020,business_type_sum1)
+business_type_sum3 = left_join(business_type_sum_2019,business_type_sum2)
+business_type_sum4 = left_join(business_type_sum_2018,business_type_sum3)
+business_type_sum5 = left_join(business_type_sum_2017,business_type_sum4)
+business_type_sum6 = left_join(business_type_sum_2016,business_type_sum5)
+business_type_sum7 = left_join(business_type_sum_2015,business_type_sum6)
+business_type_sum8 = left_join(business_type_sum_2014,business_type_sum7)
+business_type_sum9 = left_join(business_type_sum_2013,business_type_sum8)
+business_type_sum = left_join(business_type_sum_2012,business_type_sum9)
+years = c("2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022")
+t1 <- t(data.frame(business_type_sum,row.names=1))
+t2 <- as.data.frame(t1,row.names=F)
+business_type_sum_closed <- as.data.frame(cbind(years,t2))
+business_type_sum_closed
+
+a = t(business_type_sum[,2:10])  
+#matplot(a,type="b",lty=1:4,col=1:4,xlab = "years",ylab = "went out of business",pch=1,xaxt="n")+
+#    axis(side=1,at=1:9,labels=c("2012","2013","2014","2015","2016","2017","2018","2019","2020"),cex.axis=0.6)+
+# legend(x="topright",legend= c("retail","service","food and beverage","entertainment"),lty=1:4,col=1:4,text.width = 1,cex=0.7)
+
+
+
+borough_sum_2022= business_data_closed%>%filter(grepl("2022", expiration)) %>% group_by(Borough) %>% summarise("2022"=n())
+borough_sum_2021= business_data_closed%>%filter(grepl("2021", expiration)) %>% group_by(Borough) %>% summarise("2021"=n())
+borough_sum_2019= business_data_closed%>%filter(grepl("2019", expiration)) %>% group_by(Borough) %>% summarise("2019"=n())
+borough_sum_2020= business_data_closed%>%filter(grepl("2020", expiration)) %>% group_by(Borough) %>% summarise("2020"=n())
+borough_sum_2018= business_data_closed%>%filter(grepl("2018", expiration)) %>% group_by(Borough) %>% summarise("2018"=n())
+borough_sum_2017= business_data_closed%>%filter(grepl("2017", expiration)) %>% group_by(Borough) %>% summarise("2017"=n())
+borough_sum_2016= business_data_closed%>%filter(grepl("2016", expiration)) %>% group_by(Borough) %>% summarise("2016"=n())
+borough_sum_2015= business_data_closed%>%filter(grepl("2015", expiration)) %>% group_by(Borough) %>% summarise("2015"=n())
+borough_sum_2014= business_data_closed%>%filter(grepl("2014", expiration)) %>% group_by(Borough) %>% summarise("2014"=n())
+borough_sum_2013= business_data_closed%>%filter(grepl("2013", expiration)) %>% group_by(Borough) %>% summarise("2013"=n())
+borough_sum_2012= business_data_closed%>%filter(grepl("2012", expiration)) %>% group_by(Borough) %>% summarise("2012"=n())
+
+borough_sum1 = left_join(borough_sum_2021,borough_sum_2022)
+borough_sum2 = left_join(borough_sum_2020,borough_sum1)
+borough_sum3 = left_join(borough_sum_2019,borough_sum2)
+borough_sum4 = left_join(borough_sum_2018,borough_sum3)
+borough_sum5 = left_join(borough_sum_2017,borough_sum4)
+borough_sum6 = left_join(borough_sum_2016,borough_sum5)
+borough_sum7 = left_join(borough_sum_2015,borough_sum6)
+borough_sum8 = left_join(borough_sum_2014,borough_sum7)
+borough_sum9 = left_join(borough_sum_2013,borough_sum8)
+borough_sum = left_join(borough_sum_2012,borough_sum9)
+
+years = c("2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022")
+t3 <- t(data.frame(borough_sum,row.names=1))
+t4 <- as.data.frame(t3,row.names=F)
+borough_sum_closed <- as.data.frame(cbind(years,t4))
+borough_sum_closed
 
 Business_closed <- business_data %>% filter(status == "Inactive") %>% 
   filter(grepl("2020",expiration)) %>%
@@ -223,5 +297,21 @@ Business_closed <- business_data %>% filter(status == "Inactive") %>%
                        ifelse(no <= 32 & no >9, "intermediate", 
                               ifelse(no > 32 & no <= 50 , "serious", "very serious"))))
 
+######## ----------- NYC Covid-19 Confirmed Cases data NEEDED ---------------~####
+
+Confirmed_case_data <- cases_by_day_data %>% 
+  pivot_longer(c("BX_CASE_COUNT", "BK_CASE_COUNT","MN_CASE_COUNT", "QN_CASE_COUNT", "SI_CASE_COUNT"),
+               names_to = "borough",
+               values_to = "cases")%>%
+  mutate(`borough` = ifelse(grepl("BX_CASE_COUNT",`borough`), "Bronx",
+                            ifelse(grepl("BK_CASE_COUNT",`borough`), "Brooklyn",
+                                   ifelse(grepl("MN_CASE_COUNT", `borough`), "Manhattan",
+                                          ifelse(grepl("QN_CASE_COUNT", `borough`), "Queens",
+                                                 ifelse(grepl("SI_CASE_COUNT", `borough`), "Staten Island", NA))))))%>%
+  rename(Date = date_of_interest)%>%
+  select(Date, borough, cases)
+
+Confirmed_case_data_closed = Confirmed_case_data %>% 
+  rename( "borough1" = "borough" )
 
 
