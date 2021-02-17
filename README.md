@@ -2,9 +2,12 @@
 
 ### [Project Description](doc/project2_desc.md)
 
-![screenshot](doc/figs/map.jpg)
+![screenshot](doc/figs/Shiny1.png)
+![screenshot](doc/figs/Shiny2.png)
+![screenshot](doc/figs/Shiny3.png)
 
-In this second project of GR5243 Applied Data Science, we develop a *Exploratory Data Analysis and Visualization* shiny app on a topic of your choice using [JHU CSSE Covid-19 Data](https://github.com/CSSEGISandData/COVID-19) or NYC Health open data released on the [NYC Coronavirus Disease 2019 Data](https://github.com/nychealth/coronavirus-data) website. See [Project 2 Description](doc/project2_desc.md) for more details.  
+
+We develop a *Exploratory Data Analysis and Visualization* shiny app on a topic NYC Health open data released on the [NYC Coronavirus Disease 2019 Data](https://github.com/nychealth/coronavirus-data) website. See [Project 2 Description](doc/project2_desc.md) for more details.  
 
 The **learning goals** for this project is:
 
@@ -22,15 +25,25 @@ Term: Spring 2021
 
 + Team #
 + **Projec title**: + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
+	+ Wendy Doan
+	+ Qizhen Yang
+	+ Qiao Li
+	+ Yandong Xiong
+	+ James Smiley
 
-+ **Project summary**: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
++ **Project summary**: 
++ Drawing data from multiple sources, this application provides insight into the economic impact of coronavirus 2019 (COVID-19) on New York’s city economy. The results shed light on both the financial fragility of many businesses, and the significant impact COVID-19 had on these businesses in the weeks after the COVID-19–related disruptions began.
++ The application will mainly track down the change in the number of businesses being closed or newly opened across Covid timeline. We divided the businesses into 4 types: Retail, Service, Food and Beverage, Entertainment
 
-+ **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
+
++ **Contribution statement**: ([default](doc/a_note_on_contributions.md)) 
++ Wendy, Qizhen, Yandong and Qiao designed the study. 
++ Wendy contributes to the Home, Map and Appendix page in the App. 
++ Yandong contributes to the graphs on the number of new business created in NYC and different borough. 
++ Qiao contributes to the graphs on the number of business closed in NYC and different borough. 
++ Qizhen contributes to the graphs on the monthly confirmed cases in different borough in NYC and plan the group meeting.
++ Wendy, Yandong, Qiao, Qizhen helps each other to debug the codes.
++ James presents the projects only. 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
