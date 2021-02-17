@@ -28,7 +28,7 @@ Term: Spring 2021
 	+ Qiao Li
 	+ James Bergin Smiley
 
-+ **Project summary**: This App is designed for the people who are interested in the influence of coronavirus on the small business in NYC. Specifically, people can use this App to check how many new businesses were created and how many business were closed during the pandemic. We divide the small business into four different types: Entertainment, Food and Beverage, Retail and Service. 
++ **Project summary**: This App is designed for the people who are interested in the influence of coronavirus on the small business in NYC. Specifically, people can use this App to check how many new businesses were created, how many business were closed during the pandemic and how many confirmed cases in each borough in NYC. We divide the small business into four different types: Entertainment, Food and Beverage, Retail and Service. 
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
