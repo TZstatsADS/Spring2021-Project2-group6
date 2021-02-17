@@ -18,6 +18,7 @@ The **learning goals** for this project is:
 *The above general statement about project 2 can be removed once you are finished with your project. It is optional.
 
 ## Project Title: The Influence of Covid-19 on the Small Business
+## Project Title Lorem ipsum dolor sit amet
 Term: Spring 2021
 
 + Team  Group_6
@@ -27,6 +28,15 @@ Term: Spring 2021
 	+ Yandong Xiong
 	+ Qiao Li
 	+ James Bergin Smiley
+=======
++ Team #
++ **Projec title**: + Team members
+	+ team member 1
+	+ team member 2
+	+ team member 3
+	+ team member 4
+	+ team member 5
+>>>>>>> parent of 1c35101... Update README.md
 
 + **Project summary**: This App is designed for the people who are interested in the influence of coronavirus on the small business in NYC. Specifically, people can use this App to check how many new businesses were created and how many business were closed during the pandemic. We divide the small business into four different types: Entertainment, Food and Beverage, Retail and Service. 
 
