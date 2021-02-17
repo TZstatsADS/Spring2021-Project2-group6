@@ -100,12 +100,12 @@ body <- dashboardBody(
                 sidebarPanel(
                     
                     # Input: Select for the borough ----
-                    selectInput(inputId = "borough",
+                    selectInput(inputId = "Borough",
                                 label = "Choose a borough:",
                                 choices = c("Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island")),
                     
                     # Input: Select for the business type ----
-                    selectInput(inputId = "business_type",
+                    selectInput(inputId = "Business_type",
                                 label = "Choose a business type:",
                                 choices = c("retail", "service", "food and beverage", "entertainment")),
                     numericInput("obs", "lines", 5),
@@ -189,4 +189,3 @@ ui <- dashboardPage(
     )),
     body 
 )
-
