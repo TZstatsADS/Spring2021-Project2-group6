@@ -79,7 +79,16 @@ plot(data$n, type = "o", pch = 22, lty = 1, pty = 2,
          main = "New business created by month from 2019 to 2020")
 axis.Date(1, at=seq(as.Date("01-01-2019"), as.Date("12-01-2020"), by="months"), format="%m-%Y")
 plot(n ~ as.Date(date), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2)
+abline(v = c(as.Date("2020/03/01","%Y/%m/%d"), 
+             as.Date("2020/06/01","%Y/%m/%d"),
+             as.Date("2020/07/01","%Y/%m/%d"),
+             as.Date("2020/09/01","%Y/%m/%d")), 
+       col = c("red","purple","green","blue"))
+legend("topright", legend=c("Non Essentials Stay Home", "Phase 1 & 2 Reopening",
+                            "Phase 2 & 3 Reopening", "Phase 4 Reopening"),
+       col=c("red","purple","green","blue"), lty=1, cex=0.8)
 axis.Date(1, at = data$date, format= "%m-%Y", las = 1)
+#abline(v = format(as.Date("2019/12/01","%Y/%m/%d"), "%m-%Y"))
 ```
 
 
