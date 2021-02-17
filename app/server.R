@@ -75,6 +75,34 @@ shinyServer(function(input, output) {
         
         ####################### Tab 3 New Business ##################
         
+        Confirmed_case <- reactive({
+                if ( "Manhattan" %in% input$borough1){
+                        data = Confirmed_case_data_new %>% filter(borough1 == "Manhattan")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Bronx" %in% input$borough1){
+                        data = Confirmed_case_data_new %>% filter(borough1 == "Bronx")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Brooklyn" %in% input$borough1){
+                        data = Confirmed_case_data_new %>% filter(borough1 == "Brooklyn")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Queens" %in% input$borough1){
+                        data = Confirmed_case_data_new %>% filter(borough1 == "Queens")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Staten Island" %in% input$borough1){
+                        data = Confirmed_case_data_new %>% filter(borough1 == "Staten Island")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+        })
+        
         business_type_data <- reactive({
                 if ( "retail" %in% input$business_type){
                         data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
@@ -135,6 +163,14 @@ shinyServer(function(input, output) {
                 }
         })
         
+        output$tsPlot0 <- renderPlot({
+                data = Confirmed_case()
+                plot(num ~ as.Date(month), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2,
+                     ylab = "monthly confirmed cases", xlab = "",
+                     main = paste("Number of confirmed cases in ",  input$borough1))
+                axis.Date(1, at = data$month, format= "%m-%Y", las = 1)
+        })
+        
         output$tsPlot1 <- renderPlot({
                 borough_data = borough_data()
                 plot(n ~ as.Date(date), borough_data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2, 
@@ -170,6 +206,34 @@ shinyServer(function(input, output) {
         })
         
         ####################### Tab 4 Closed Business ##################       
+        
+        Confirmed_case_closed <- reactive({
+                if ( "Manhattan" %in% input$Borough1){
+                        data = Confirmed_case_data_closed %>% filter(Borough1 == "Manhattan")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Bronx" %in% input$Borough1){
+                        data = Confirmed_case_data_closed %>% filter(Borough1 == "Bronx")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Brooklyn" %in% input$Borough1){
+                        data = Confirmed_case_data_closed %>% filter(Borough1 == "Brooklyn")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Queens" %in% input$Borough1){
+                        data = Confirmed_case_data_closed %>% filter(Borough1 == "Queens")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+                if ( "Staten Island" %in% input$Borough1){
+                        data = Confirmed_case_data_closed %>% filter(Borough1 == "Staten Island")
+                        return( data %>% mutate(Month = format(as.Date(Date, format = "%m/%d/%Y"), "%Y/%m"))
+                                %>%group_by(Month)%>%summarise( num = sum(cases)) %>%mutate( month = paste(Month,"/01", sep = ""))) 
+                }
+        })
         
         business_type_data_closed <- reactive({
                 if ( "retail" %in% input$Business_type){
@@ -212,6 +276,17 @@ shinyServer(function(input, output) {
                         return(data %>% count(date = format(as.Date(expiration, format = "%m/%d/%Y"), "%Y/%m")) %>% mutate(date = paste(date,"/01", sep = "")))
                 }
         })
+        
+        
+        
+        output$tsPlot_Covid_closed <- renderPlot({
+                data = Confirmed_case_closed()
+                plot(num ~ as.Date(month), data, xaxt = "n", type = "o", pch = 22, lty = 1, pty = 2,
+                     ylab = "monthly confirmed cases", xlab = "",
+                     main = paste("Number of confirmed cases in ",  input$Borough1))
+                axis.Date(1, at = data$month, format= "%m-%Y", las = 1)
+        })
+        
         
         output$tsPlot_closed_borough <- renderPlot({
                 data = borough_data_closed()
