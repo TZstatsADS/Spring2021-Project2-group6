@@ -90,6 +90,7 @@ body <- dashboardBody(
             )
         )
         ), 
+
         #------------------closed Business----------------------------
         tabItem(tabName = "Closed_Business", fluidPage(
             
@@ -141,6 +142,8 @@ body <- dashboardBody(
         )
         ),
         
+
+
         
         # ------------------ Appendix --------------------------------
         tabItem(tabName = "Appendix", fluidPage( 
@@ -197,7 +200,6 @@ ui <- dashboardPage(
         menuItem("Home", tabName = "Home", icon = icon("home")),
         menuItem("Map", tabName = "Map", icon = icon("compass")),
         menuItem("New Business", tabName = "New_Business", icon = icon("dollar-sign")),
-        menuItem("Closed Business", tabName = "Closed_Business", icon = icon("dollar-sign")),
         menuItem("Appendix", tabName = "Appendix", icon = icon("fas fa-asterisk"))
     )),
     body 

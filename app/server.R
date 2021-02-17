@@ -73,6 +73,7 @@ shinyServer(function(input, output) {
         # end of tab
         
         
+
         ####################### Tab 3 New Business ##################
         
         Confirmed_case <- reactive({
@@ -103,6 +104,8 @@ shinyServer(function(input, output) {
                 }
         })
         
+
+
         business_type_data <- reactive({
                 if ( "retail" %in% input$business_type){
                         data = business_data %>% filter(grepl("2020", start_date) | grepl("2019", start_date), 
@@ -204,6 +207,7 @@ shinyServer(function(input, output) {
                        col=c("red","purple","green","blue"), lty=1, cex=0.8)
                 axis.Date(1, at = business_type_data$date, format= "%m-%Y", las = 1)
         })
+
         
         ####################### Tab 4 Closed Business ##################       
         
@@ -338,3 +342,6 @@ shinyServer(function(input, output) {
                 legend(x="topright",legend= c("entertainment","food and beverage","retail","service"),lty=1:4,col=1:4,text.width = 1,cex=0.7)
         })
 })
+
+})
+
