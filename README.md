@@ -35,6 +35,7 @@ Term: Spring 2021
 + Drawing data from multiple sources, this application provides insight into the economic impact of coronavirus 2019 (COVID-19) on New York’s city economy. The results shed light on both the financial fragility of many businesses, and the significant impact COVID-19 had on these businesses in the weeks after the COVID-19–related disruptions began.
 + The application will mainly track down the change in the number of businesses being closed or newly opened across Covid timeline. We divided the businesses into 4 types: Retail, Service, Food and Beverage, Entertainment
 
+Our app is live [here](https://liqiaosally.shinyapps.io/app1/)
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) 
 + Wendy, Qizhen, Yandong and Qiao designed the study. 
